@@ -8,7 +8,8 @@ import java.util.UUID;
 import java.util.Vector;
 
 public abstract class CallBackable {
-	public UUID uuid = UUID.randomUUID();
-	public Vector<SystemCommandExecutor> exeVector = new Vector<>();
-	public abstract void callback (Object[] argv);
+  public UUID uuid = UUID.randomUUID();
+  public Vector<SystemCommandExecutor> exeVector = new Vector<>();
+
+  public abstract void callback(Object[] argv);
 }

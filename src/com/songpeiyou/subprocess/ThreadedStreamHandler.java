@@ -11,54 +11,48 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 
 class ThreadedStreamHandler extends Thread {
-	InputStream inputStream;
-	OutputStream outputStream;
-	PrintWriter printWriter;
-	StringBuilder outputBuffer = new StringBuilder();
-	boolean printoutput = false;
-	boolean printerr = false;
-	
+  InputStream inputStream;
+  OutputStream outputStream;
+  PrintWriter printWriter;
+  StringBuffer outputBuffer = new StringBuffer();
+  boolean printoutput = false;
+  boolean printerr = false;
 
-	ThreadedStreamHandler(InputStream inputStream) {
-		this.inputStream = inputStream;
-	}
 
-	ThreadedStreamHandler(InputStream inputStream, OutputStream outputStream, boolean printoutput) {
-		this.inputStream = inputStream;
-		this.outputStream = outputStream;
-		this.printWriter = new PrintWriter(outputStream);
-		this.printoutput = printoutput;
-	}
+  ThreadedStreamHandler(InputStream inputStream) {
+    this.inputStream = inputStream;
+  }
 
-	public void run() {
+  ThreadedStreamHandler(InputStream inputStream, OutputStream outputStream, boolean printoutput) {
+    this.inputStream = inputStream;
+    this.outputStream = outputStream;
+    this.printWriter = new PrintWriter(outputStream);
+    this.printoutput = printoutput;
+  }
 
-		BufferedReader bufferedReader = null;
-		try {
-			bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-			String line = null;
-			while ((line = bufferedReader.readLine()) != null) {
-				outputBuffer.append(line + "\n");
-				if (printoutput){
-					this.printWriter.println(line);
-//					System.out.println(line);
-				}
-				if (printerr){
-					System.err.println(line);
-				}
-			}
-		} catch (IOException ioe) {
-		} catch (Throwable t) {
-			t.printStackTrace();
-		} finally {
-			try {
-				bufferedReader.close();
-			} catch (IOException e) {
-			}
-		}
-	}
+  @Override
+  public void run() {
 
-	public StringBuilder getOutputBuffer() {
-		return outputBuffer;
-	}
+    try (InputStreamReader isr = new InputStreamReader(this.inputStream);
+        BufferedReader bufferedReader = new BufferedReader(isr)) {
+      String line = null;
+      while (this.inputStream != null && (line = bufferedReader.readLine()) != null) {
+        this.outputBuffer.append(line + "\n");
+        if (this.printoutput) {
+          this.printWriter.println(line);
+          // System.out.println(line);
+        }
+        if (this.printerr) {
+          System.err.println(line);
+        }
+      }
+    } catch (IOException e) {
+      if (!"Stream closed".equals(e.getMessage())) e.printStackTrace();
+    }
+  }
+
+  public StringBuffer getOutputBuffer() {
+    return this.outputBuffer;
+  }
 
 }

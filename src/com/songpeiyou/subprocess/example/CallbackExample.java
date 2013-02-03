@@ -14,27 +14,25 @@ import com.songpeiyou.subprocess.SystemCommandExecutor;
 
 public class CallbackExample extends CallBackable {
 
-	@Override
-	public void callback(Object[] argv) {
-		SystemCommandExecutor exe = (SystemCommandExecutor) argv[0];
-		StringBuilder out = exe.getStandardOutputFromCommand();
-		StringBuilder err = exe.getStandardErrorFromCommand();
+  @Override
+  public void callback(Object[] argv) {
+    SystemCommandExecutor exe = (SystemCommandExecutor) argv[0];
+    StringBuffer out = exe.getStandardOutputFromCommand();
+    StringBuffer err = exe.getStandardErrorFromCommand();
 
-		FileWriter fstream;
-		try {
-			fstream = new FileWriter("output", true);
-			BufferedWriter outfile = new BufferedWriter(fstream);
+    try (FileWriter fstream = new FileWriter("output", true);
+        BufferedWriter outfile = new BufferedWriter(fstream)) {
 
-			outfile.write("aString = " + exe.getString("aString") + "\n");
-			outfile.write("anInt = " + (Integer) exe.getInfo("anInt") + "\n");
-			outfile.write("The err of the command:\n");
-			outfile.write(err.toString());
-			outfile.write("The output of the command:\n");
-			outfile.write(out.toString());
-			outfile.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
+      outfile.write("aString = " + exe.getString("aString") + "\n");
+      outfile.write("anInt = " + exe.getInfo("anInt") + "\n");
+      outfile.write("The err of the command:\n");
+      outfile.write(err.toString());
+      outfile.write("The output of the command:\n");
+      outfile.write(out.toString());
+      outfile.close();
+      fstream.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 }
